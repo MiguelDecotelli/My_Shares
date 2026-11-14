@@ -1,17 +1,27 @@
 {% extends "layout.html" %}
-
-{% block title %}
-Add Some Cash
-{% endblock %}
-
+{% block title %}Add Cash{% endblock %}
 {% block main %}
-<h1>Add Cash</h1>
-
-<form method="post">
-    {{form.hidden_tag()}}
-    {{form.add_cash(class="form-control mx-auto w-auto mb-3")}}
-    {{form.add_card(class="form-control mx-auto w-auto mb-3")}}
-    {{form.password(class="form-control mx-auto w-auto mb-3")}}
-    {{form.submit(class="btn btn-color")}}
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5 mt-4">
+        <h3 class="mb-4">Add Some Cash</h3>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div class="mb-3 text-start">
+                <label class="form-label text-muted ms-1">Amount to Add ($)</label>
+                {{ form.add_cash(class="form-control form-control-lg", min="1") }}
+            </div>
+            <div class="mb-3 text-start">
+                <label class="form-label text-muted ms-1">Credit Card Number</label>
+                {{ form.add_card(class="form-control form-control-lg") }}
+            </div>
+            <div class="mb-4 text-start">
+                <label class="form-label text-muted ms-1">Account Password</label>
+                {{ form.password(class="form-control form-control-lg") }}
+            </div>
+            <div class="d-grid mt-4">
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

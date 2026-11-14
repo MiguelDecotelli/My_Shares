@@ -32,7 +32,8 @@ def check_credit_card(card):
     final_n_14 = math.floor((number_14 % pow(10, 2)) / 10 + (number_14 % pow(10, 1)))
     final_n_16 = math.floor((number_16 % pow(10, 2)) / 10 + (number_16 % pow(10, 1)))
 
-    sum_second_last = (final_n_02 + final_n_04 + final_n_06 + final_n_08 + final_n_10 + final_n_12 + final_n_14 + final_n_16)
+    sum_second_last = (final_n_02 + final_n_04 + final_n_06 +
+                        final_n_08 + final_n_10 + final_n_12 + final_n_14 + final_n_16)
 
     number_01 = math.floor((card % pow(10, 1)))
     number_03 = math.floor((card % pow(10, 3)) / pow(10, 2))
@@ -43,7 +44,8 @@ def check_credit_card(card):
     number_13 = math.floor((card % pow(10, 13)) / pow(10, 12))
     number_15 = math.floor((card % pow(10, 15)) / pow(10, 14))
 
-    sum_remainder = (number_01 + number_03 + number_05 + number_07 + number_09 + number_11 + number_13 + number_15)
+    sum_remainder = (number_01 + number_03 + number_05
+                     + number_07 + number_09 + number_11 + number_13 + number_15)
 
     final_sum = (sum_second_last + sum_remainder)
 
@@ -56,7 +58,8 @@ def check_credit_card(card):
         return True
     elif ((final_sum % 10 == 0 and VISA13 == 4)):
         return True
-    elif ((final_sum % 10 == 0 and (MASTER >= 51 and MASTER <= 55)) or (final_sum % 10 == 0 and (MASTER == 22))):
+    elif ((final_sum % 10 == 0 and (MASTER >= 51 and MASTER <= 55)) or
+           (final_sum % 10 == 0 and (MASTER == 22))):
         return True
     elif ((final_sum % 10 == 0 and (AMEX == 34 or AMEX == 37))):
         return True

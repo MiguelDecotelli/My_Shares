@@ -46,4 +46,14 @@ class Portfolio(db.Model):
         self.total = total
 
     def __repr__(self):
-        return f"{self.symbol} - {self.shares} - {self.transaction_type} - {self.price} {self.total}"
+        return f"{self.symbol} - {self.shares} - {self.transaction_type}- {self.price} {self.total}"
+
+class Watchlist(db.Model):
+    __tablename__ = 'watchlist'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    symbol = Column(String(14))
+    name = Column(String(64))
+
+    def __repr__(self):
+        return f"<Watchlist {self.symbol} - {self.name}>"

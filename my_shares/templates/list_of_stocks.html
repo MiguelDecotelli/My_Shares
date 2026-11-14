@@ -1,44 +1,126 @@
 {% extends "layout.html" %}
 
-{% block title %}
-List of all Stocks
-{% endblock %}
+{% block title %} Search Stocks {% endblock %}
 
 {% block main %}
-<h1>List of Stocks</h1>
-<form method="post">
-    {{form.hidden_tag()}}
-    {{form.symbol_search(class="form-control mx-auto w-auto mb-3")}}
-    {{form.submit(class="btn btn-color") }}
-</form>
-
-{% if no_company %}
-<h3>No Company found!</h3>
-{% else %}
-{% if list_of_shares %}
-<div class="container tables">
-    <table class="table table-striped">
-        <thead class="stocks-thead">
-            <tr>
-                <th class="symbol-column">Symbol</th>
-                <th class="company-name-column">Company Name</th>
-                <th class="industry-column">Industry</th>
-                <th class="market-cap-column">Market Cap</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for share in list_of_shares %}
-            <tr class="{{'even' if loop.index % 2 == 0 else 'odd'}}">
-                <td>{{ share.symbol }}</td>
-                <td>{{ share.company_name}}</td>
-                <td>{{ share.industry }}</td>
-                <td>{{ share.market_cap}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
-    {% endif %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7 mt-4 mb-5">
+        <h3 class="mb-4">Live Search</h3>
+        <div class="input-group input-group-lg">
+            <span class="input-group-text bg-dark border-secondary text-muted" id="search-icon">🔍</span>
+            <input type="text" id="liveSearchInput" class="form-control bg-dark text-light border-secondary" placeholder="Start typing a symbol or name (e.g., TSLA, Apple)..." autofocus>
+        </div>
+    </div>
 </div>
 
+<div class="table-responsive">
+    <table class="table table-hover table-borderless align-middle text-start" id="resultsTable" style="display: none;">
+        <thead>
+            <tr>
+                <th style="width: 5%"></th>
+                <th>Symbol</th>
+                <th>Company Name</th>
+                <th>Industry</th>
+                <th class="text-end">Market Cap</th>
+                <th class="text-end">Action</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- Os resultados serão injetados aqui via JS -->
+        </tbody>
+    </table>
+    <div id="noResults" class="text-center text-muted mt-5" style="display: none;">
+        <h5>No companies found matching your search.</h5>
+    </div>
+</div>
+
+<!-- Estilos do botão de favorito -->
+<style>
+    .star-btn { cursor: pointer; font-size: 1.2rem; background: none; border: none; padding: 0; }
+    .star-added { color: #FFD700; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+    .star-removed { color: #6c757d; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("liveSearchInput");
+    const resultsTable = document.getElementById("resultsTable");
+    const resultsBody = document.getElementById("resultsBody");
+    const noResults = document.getElementById("noResults");
+    let typingTimer;
+
+    // Função de busca assíncrona
+    searchInput.addEventListener("input", function() {
+        clearTimeout(typingTimer);
+        const query = searchInput.value.trim();
+
+        if (query.length < 2) {
+            resultsTable.style.display = "none";
+            noResults.style.display = "none";
+            return;
+        }
+
+        typingTimer = setTimeout(() => {
+            fetch(`/api/search_stocks?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsBody.innerHTML = "";
+                    
+                    if (data.length === 0) {
+                        resultsTable.style.display = "none";
+                        noResults.style.display = "block";
+                        return;
+                    }
+
+                    noResults.style.display = "none";
+                    resultsTable.style.display = "table";
+
+                    data.forEach(stock => {
+                        const starClass = stock.is_favorite ? "star-added" : "star-removed";
+                        const starChar = stock.is_favorite ? "★" : "☆";
+                        
+                        const row = `
+                            <tr>
+                                <td>
+                                    <button class="star-btn ${starClass}" onclick="toggleFavorite(this, '${stock.symbol}', '${stock.name}')">${starChar}</button>
+                                </td>
+                                <td><span class="badge bg-primary fs-6">${stock.symbol}</span></td>
+                                <td class="fw-bold text-light">${stock.name}</td>
+                                <td class="text-muted">${stock.industry}</td>
+                                <td class="text-end text-light">${stock.market_cap}</td>
+                                <td class="text-end">
+                                    <a href="/quote?symbol=${stock.symbol}" class="btn btn-sm btn-outline-secondary">Quote</a>
+                                </td>
+                            </tr>
+                        `;
+                        resultsBody.insertAdjacentHTML("beforeend", row);
+                    });
+                });
+        }, 300); // Aguarda 300ms após o usuário parar de digitar para fazer a busca
+    });
+});
+
+// Função para adicionar/remover da Watchlist via AJAX
+function toggleFavorite(btnElement, symbol, name) {
+    fetch("/toggle_watchlist", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ symbol: symbol, name: name })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "added") {
+            btnElement.classList.remove("star-removed");
+            btnElement.classList.add("star-added");
+            btnElement.innerHTML = "★";
+        } else if (data.status === "removed") {
+            btnElement.classList.remove("star-added");
+            btnElement.classList.add("star-removed");
+            btnElement.innerHTML = "☆";
+        }
+    });
+}
+</script>
 {% endblock %}

@@ -1,17 +1,33 @@
 {% extends "layout.html" %}
 
-{% block title %}
-    Buy
-{% endblock %}
+{% block title %} Buy {% endblock %}
 
 {% block main %}
-<h1>Buy</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5 mt-4">
+        <h3 class="mb-4">Buy Shares</h3>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            
+            <div class="mb-3 text-start">
+                <label class="form-label text-muted ms-1">Symbol (e.g. AAPL, TSLA)</label>
+                <!-- AQUI ESTÁ A LÓGICA DA TRAVA -->
+                {% if request.args.get('symbol') %}
+                    {{ form.symbol(class="form-control form-control-lg text-uppercase text-muted", readonly="readonly") }}
+                {% else %}
+                    {{ form.symbol(class="form-control form-control-lg text-uppercase") }}
+                {% endif %}
+            </div>
 
-<form method="post">
-    {{form.hidden_tag()}}
-    {{form.symbol(class="form-control mx-auto w-auto mb-3")}}
-    {{form.shares(class="form-control mx-auto w-auto mb-3")}}
-    {{ form.submit(class="btn btn-color") }}
-</form>
-
+            <div class="mb-4 text-start">
+                <label class="form-label text-muted ms-1">Number of Shares</label>
+                {{ form.shares(class="form-control form-control-lg", min="1") }}
+            </div>
+            
+            <div class="d-grid mt-4">
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

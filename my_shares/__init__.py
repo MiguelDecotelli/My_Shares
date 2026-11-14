@@ -9,7 +9,8 @@ app = Flask(__name__)
 login_manager = LoginManager()
 
 app.config['SECRET_KEY'] = SECRET_KEY
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{USER}:{PASSWORD}@{HOST}/{DATABASE}'
+# app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{USER}:{PASSWORD}@{HOST}/{DATABASE}'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///my_shares.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)

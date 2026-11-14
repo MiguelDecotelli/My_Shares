@@ -1,14 +1,27 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Quote
+    Quote
 {% endblock %}
 
 {% block main %}
-<h1>Quote</h1>
-<form method="post">
-    {{form.hidden_tag()}}
-    {{form.symbol(class="form-control mx-auto w-auto mb-3")}}
-    {{form.submit(class="btn btn-color") }}
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5 mt-4">
+        <h3 class="mb-4">Quote a Stock</h3>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div class="mb-3 text-start">
+                <label class="form-label text-muted ms-1">Symbol (e.g. AAPL, TSLA)</label>
+                {% if request.args.get('symbol') %}
+                    {{ form.symbol(class="form-control form-control-lg text-uppercase text-muted", readonly="readonly") }}
+                {% else %}
+                    {{ form.symbol(class="form-control form-control-lg text-uppercase") }}
+                {% endif %}
+            </div>
+            <div class="d-grid mt-4">
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}

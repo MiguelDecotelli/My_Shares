@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, IntegerField, FloatField
-from wtforms.validators import DataRequired, EqualTo
+from wtforms.validators import DataRequired, EqualTo, ValidationError
 from my_shares.models import User
 from my_shares.my_functions import apology
 
@@ -15,10 +15,10 @@ class RegistrationForm(FlaskForm):
     pass_confirm = PasswordField('Confirm Password', validators=[DataRequired()], render_kw={"placeholder":"Confirm password"})
     submit = SubmitField('Register')
 
-    def check_username(self, field):
-        # Check if not None for that username!
+    def validate_username(self, field):
+        # WTForms exige que o método comece com 'validate_'
         if User.query.filter_by(username=field.data).first():
-            return apology('Sorry, that username is taken!')
+            raise ValidationError('Sorry, that username is taken!')
         
 class ChangePassword(FlaskForm):
     old_password = PasswordField('old_assword', validators=[DataRequired()], render_kw={"placeholder":"Current password"})

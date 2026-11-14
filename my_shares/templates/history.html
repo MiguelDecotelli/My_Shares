@@ -8,28 +8,34 @@ History
 <h1>History</h1>
 {% if transactions %}
 <div class="container tables">
-    <table class="table table-striped">
-        <thead class="history-thead">
+    <table class="table table-hover table-borderless align-middle text-start">
+    <thead>
+        <tr>
+            <th>Symbol</th>
+            <th class="text-end">Shares</th>
+            <th class="text-end">Price</th>
+            <th class="text-center">Type</th>
+            <th class="text-end">Transacted</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in transactions %}
             <tr>
-                <th>Symbol</th>
-                <th>Shares</th>
-                <th>Price</th>
-                <th>Type</th>
-                <th>Transacted</th>
+                <td><strong>{{ row.symbol }}</strong></td>
+                <td class="text-end">{{ row.shares }}</td>
+                <td class="text-end">{{ row.price | usd }}</td>
+                <td class="text-center">
+                    {% if row.transaction_type == 'Buy' %}
+                        <span class="badge bg-success bg-opacity-25 text-success px-3">Buy</span>
+                    {% else %}
+                        <span class="badge bg-danger bg-opacity-25 text-danger px-3">Sell</span>
+                    {% endif %}
+                </td>
+                <td class="text-end text-muted">{{ row.transaction_time }}</td>
             </tr>
-        </thead>
-        <tbody>
-            {% for column in transactions %}
-            <tr class="{{'even' if loop.index % 2 == 0 else 'odd'}}">
-                <td>{{column.symbol}}</td>
-                <td>{{column.shares}}</td>
-                <td>{{column.price | usd}}</td>
-                <td>{{column.transaction_type}}</td>
-                <td>{{column.transaction_time.strftime('%Y/%m/%d, %H:%M:%S')}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        {% endfor %}
+    </tbody>
+</table>
 </div>
 {% else %}
 <div>

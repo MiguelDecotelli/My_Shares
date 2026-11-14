@@ -1,17 +1,90 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Quoted
+    Quoted
 {% endblock %}
 
 {% block main %}
-<form method="get">
-    <div class="mb-3">
-        <p>A share of {{name}} ({{symbol}}) costs US$ {{price}}.</p>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="text-center mb-4">
+            <h5 class="text-muted mb-1">{{ ticker.name }} ({{ ticker.symbol }})</h5>
+            <h1 class="display-3 text-white fw-bold mb-0">{{ ticker.price | usd }}</h1>
+        </div>
+        
+        {% if history %}
+        <div class="mb-5" style="position: relative; height: 250px; width: 100%;">
+            <canvas id="historyChart"></canvas>
+        </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/quote" class="btn btn-outline-secondary px-4">Quote Another</a>
+            <a href="/buy?symbol={{ ticker.symbol }}" class="btn btn-primary px-4">Go to Buy</a>
+        </div>
     </div>
-    <button class="btn btn-color" action="/quote" type="submit">Quote again</button>
+</div>
 
-</form>
+{% if history %}
+<!-- Script do Gráfico de Linha (Histórico) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('historyChart').getContext('2d');
+        
+        // Verifica se a ação subiu ou desceu no período para colorir a linha
+        const prices = {{ history.prices | tojson }};
+        const firstPrice = prices[0];
+        const lastPrice = prices[prices.length - 1];
+        const lineColor = lastPrice >= firstPrice ? '#00C853' : '#FF5252'; 
+        const bgColor = lastPrice >= firstPrice ? 'rgba(0, 200, 83, 0.1)' : 'rgba(255, 82, 82, 0.1)';
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ history.dates | tojson }},
+                datasets: [{
+                    label: 'Closing Price',
+                    data: prices,
+                    borderColor: lineColor,
+                    backgroundColor: bgColor,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0,
+                    pointHitRadius: 15
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                return '$' + context.parsed.y.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { display: false }, // Oculta as datas para um visual mais limpo
+                    y: {
+                        ticks: { color: '#9E9E9E' },
+                        grid: { color: '#333' }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}
-
-| usd

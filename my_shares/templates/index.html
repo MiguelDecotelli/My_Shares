@@ -1,50 +1,191 @@
 {% extends "layout.html" %}
 
 {% block title %}
-Portfolio
+    Portfolio
 {% endblock %}
 
 {% block main %}
-<h1>Portfolio</h1>
-{% if portfolio %}
-<div class="container tables">
-    <table class="table table-striped">
-        <thead class="portfolio-thead">
-            <tr>
-                <th>Symbol</th>
-                <th>Name</th>
-                <th>Shares</th>
-                <th>Price</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for share in portfolio %}
-            <tr class="{{'even' if loop.index % 2 == 0 else 'odd'}}">
-                <td>{{ share.symbol }}</td>
-                <td>{{ share.name }}</td>
-                <td>{{ share.shares }}</td>
-                <td>{{ share.price | usd }}</td>
-                <td>{{ share.total | usd }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr class="portfolio-tfoot">
-                <td id="cash-td" colspan="4">Cash</td>
-                <td style="color: black; font-weight: bolder;">{{ cash | usd }}</td>
-            </tr>
-            <tr class="portfolio-tfoot">
-                <td id="total-cash-td" colspan="4">TOTAL</td>
-                <td style="color: forestgreen; font-weight: bolder;">{{ total_cash | usd}}</td>
-            </tr>
-        </tfoot>
-    </table>
-    {% else %}
-    <div>
-        <h4>You don't have any shares yet. Try to buy some.</h4>
+<div class="container-fluid">
+    <h2 class="mb-4 text-start">My Portfolio</h2>
+    
+    <div class="row">
+        <!-- Coluna do Gráfico -->
+        <div class="col-lg-4 mb-4">
+            <div class="custom-card h-100 d-flex flex-column align-items-center justify-content-center" style="margin-top: 0; padding: 1rem;">
+                <h5 class="text-muted mb-3">Asset Allocation</h5>
+                <canvas id="portfolioChart" width="300" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Coluna da Tabela -->
+        <div class="col-lg-8 mb-4">
+            <div class="custom-card h-100" style="margin-top: 0; padding: 1rem; overflow-x: auto;">
+                <table class="table table-hover table-borderless align-middle text-start">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Name</th>
+                            <th class="text-end">Shares</th>
+                            <th class="text-end">Current Price</th>
+                            <th class="text-end">Total Value</th>
+                            <th class="text-end">P&L ($)</th>
+                            <th class="text-end">P&L (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for share in portfolio %}
+                            <tr class="portfolio-row" data-symbol="{{ share.symbol }}" style="cursor: pointer;" title="Click to view history chart">
+                                <td><strong>{{ share.symbol }}</strong></td>
+                                <td class="text-muted">{{ share.name }}</td>
+                                <td class="text-end">{{ share.shares }}</td>
+                                <td class="text-end">{{ share.price | usd }}</td>
+                                <td class="text-end"><strong>{{ share.total | usd }}</strong></td>
+                                
+                                <td class="text-end {% if share.pl_value > 0 %}text-profit{% elif share.pl_value < 0 %}text-loss{% endif %}">
+                                    {{ "+" if share.pl_value > 0 else "" }}{{ share.pl_value | usd }}
+                                </td>
+                                <td class="text-end {% if share.pl_percent > 0 %}text-profit{% elif share.pl_percent < 0 %}text-loss{% endif %}">
+                                    {{ "+" if share.pl_percent > 0 else "" }}{{ "%.2f"|format(share.pl_percent) }}%
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot style="border-top: 2px solid #444;">
+                        <tr>
+                            <td colspan="4" class="text-end text-muted">CASH IN ACCOUNT</td>
+                            <td class="text-end text-primary fw-bold">{{ cash | usd }}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end text-muted"><strong>TOTAL PATRIMONY</strong></td>
+                            <td class="text-end text-success fw-bold fs-5">{{ total_cash | usd }}</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
     </div>
-    {% endif %}
 </div>
 
+<!-- Importação do Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('portfolioChart').getContext('2d');
+        const chartData = {
+            labels: {{ chart_labels | tojson }},
+            datasets: [{
+                data: {{ chart_data | tojson }},
+                backgroundColor: [
+                    '#2962FF', '#00C853', '#FFD600', '#FF5252', '#AA00FF', 
+                    '#00B8D4', '#FF6D00', '#F50057', '#00E676', '#D50000',
+                    '#651FFF', '#1DE9B6', '#1E1E1E', '#C6FF00', '#3D5AFE',
+                    '#FF3D00', '#00E5FF', '#76FF03', '#F06292', '#8D6E63'
+                ],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+                responsive: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#9E9E9E' }
+                    }
+                },
+                cutout: '75%'
+            }
+        });
+    });
+</script>
+<!-- Script para o Gráfico Expansível (Acordeão) -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const rows = document.querySelectorAll('.portfolio-row');
+        
+        rows.forEach(row => {
+            row.addEventListener('click', function() {
+                const symbol = this.getAttribute('data-symbol');
+                const nextRow = this.nextElementSibling;
+                
+                // Se a próxima linha já for o gráfico desse símbolo, nós apenas escondemos/mostramos (Toggle)
+                if (nextRow && nextRow.classList.contains('chart-row')) {
+                    nextRow.style.display = nextRow.style.display === 'none' ? 'table-row' : 'none';
+                    return;
+                }
+
+                // Cria uma nova linha para o gráfico
+                const chartRow = document.createElement('tr');
+                chartRow.className = 'chart-row';
+                // Colspan="7" para ocupar a tabela inteira de ponta a ponta
+                chartRow.innerHTML = `
+                    <td colspan="7" class="p-0 border-0">
+                        <div class="chart-container" style="background-color: #1a1a1a; border-radius: 0 0 8px 8px; padding: 1rem; border-top: 1px solid #333; display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small">30-Day History for ${symbol}</span>
+                                <div class="spinner-border spinner-border-sm text-primary" role="status" id="spinner-${symbol}"></div>
+                            </div>
+                            <div style="position: relative; height: 150px; width: 100%;">
+                                <canvas id="canvas-${symbol}"></canvas>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                
+                // Insere a nova linha logo após a linha clicada
+                this.parentNode.insertBefore(chartRow, this.nextSibling);
+                const container = chartRow.querySelector('.chart-container');
+                container.style.display = 'block'; // Mostra o container com animação do CSS, se houver
+
+                // Faz o Fetch via AJAX
+                fetch(`/api/history/${symbol}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById(`spinner-${symbol}`).style.display = 'none';
+                        
+                        if(data.error) {
+                            container.innerHTML = '<span class="text-muted">No historical data available.</span>';
+                            return;
+                        }
+
+                        const ctx = document.getElementById(`canvas-${symbol}`).getContext('2d');
+                        const prices = data.prices;
+                        const firstPrice = prices[0];
+                        const lastPrice = prices[prices.length - 1];
+                        const lineColor = lastPrice >= firstPrice ? '#00C853' : '#FF5252'; 
+                        const bgColor = lastPrice >= firstPrice ? 'rgba(0, 200, 83, 0.1)' : 'rgba(255, 82, 82, 0.1)';
+
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: data.dates,
+                                datasets: [{
+                                    data: prices,
+                                    borderColor: lineColor,
+                                    backgroundColor: bgColor,
+                                    borderWidth: 2,
+                                    fill: true,
+                                    tension: 0.3,
+                                    pointRadius: 0
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: { legend: { display: false } },
+                                scales: { x: { display: false }, y: { display: false } }, // Esconde os eixos para ficar minimalista
+                                interaction: { mode: 'index', intersect: false }
+                            }
+                        });
+                    });
+            });
+        });
+    });
+</script>
 {% endblock %}

@@ -1,15 +1,27 @@
 {% extends "layout.html" %}
-
-{% block title %}
-Register
-{% endblock %}
-
+{% block title %}Register{% endblock %}
 {% block main %}
-<form method="post">
-    {{form.hidden_tag()}}
-    {{ form.username(class="form-control mx-auto w-auto mb-3")}}
-    {{ form.password(class="form-control mx-auto w-auto mb-3")}}
-    {{ form.pass_confirm(class="form-control mx-auto w-auto mb-3")}}
-    {{ form.submit(class="btn btn-color") }}
-</form>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5 mt-4">
+        <h3 class="mb-4">Register</h3>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div class="mb-3 text-start">
+                <label class="form-label text-muted ms-1">Username</label>
+                {{ form.username(class="form-control form-control-lg") }}
+            </div>
+            <div class="mb-3 text-start">
+                <label class="form-label text-muted ms-1">Password</label>
+                {{ form.password(class="form-control form-control-lg") }}
+            </div>
+            <div class="mb-4 text-start">
+                <label class="form-label text-muted ms-1">Confirm Password</label>
+                {{ form.pass_confirm(class="form-control form-control-lg") }}
+            </div>
+            <div class="d-grid mt-4">
+                {{ form.submit(class="btn btn-primary btn-lg") }}
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
