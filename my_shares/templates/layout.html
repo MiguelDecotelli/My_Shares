@@ -23,7 +23,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbar">
                 {% if current_user.is_authenticated %}
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
+                    {# <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
                         <li class="nav-item"><a class="nav-link" href="/quote">Quote</a></li>
                         <li class="nav-item"><a class="nav-link" href="/buy">Buy</a></li>
                         <li class="nav-item"><a class="nav-link" href="/sell">Sell</a></li>
@@ -40,11 +40,29 @@
                             </form>
                         </li>
                         <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                    </ul>#}
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
+                        <li class="nav-item"><a class="nav-link" href="/quote">Cotar</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/buy">Comprar</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/sell">Vender</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/history">Histórico</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/list_of_stocks">Lista de Ações</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/watchlist">Favoritos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/add_cash">Caixa</a></li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+                        <li class="nav-item"><a class="nav-link" href="/change_password">Alterar Senha</a></li>
+                        <li class="nav-item">
+                            <form action="/reset_account" method="post" onsubmit="return confirm('Tem certeza que deseja declarar falência? Isso apagará todas as suas ações e histórico.');">
+                                <button type="submit" class="nav-link btn btn-link text-danger" style="text-decoration: none;">Zerar Conta</button>
+                            </form>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="/logout">Sair</a></li>
                     </ul>
                 {% else %}
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
-                        <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/register">Registrar</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/login">Logar</a></li>
                     </ul>
                 {% endif %}
             </div>
@@ -79,7 +97,7 @@
     </main>
 
     <footer class="mb-5 small text-center text-muted">
-        Data provided by <a href="https://finance.yahoo.com/" target="_blank">Yahoo Finance</a>
+        Dados fornecidos por <a href="https://finance.yahoo.com/" target="_blank">Yahoo Finance</a>
     </footer>
 
     <!-- Bootstrap JS (Necessário para o botão de fechar do Toast funcionar) -->

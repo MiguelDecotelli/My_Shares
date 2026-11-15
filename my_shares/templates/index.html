@@ -6,13 +6,13 @@
 
 {% block main %}
 <div class="container-fluid">
-    <h2 class="mb-4 text-start">My Portfolio</h2>
+    <h2 class="mb-4 text-start">Meu Portfolio</h2>
     
     <div class="row">
         <!-- Coluna do Gráfico -->
         <div class="col-lg-4 mb-4">
             <div class="custom-card h-100 d-flex flex-column align-items-center justify-content-center" style="margin-top: 0; padding: 1rem;">
-                <h5 class="text-muted mb-3">Asset Allocation</h5>
+                <h5 class="text-muted mb-3">Alocação de Ativos</h5>
                 <canvas id="portfolioChart" width="300" height="300"></canvas>
             </div>
         </div>
@@ -23,13 +23,13 @@
                 <table class="table table-hover table-borderless align-middle text-start">
                     <thead>
                         <tr>
-                            <th>Symbol</th>
-                            <th>Name</th>
-                            <th class="text-end">Shares</th>
-                            <th class="text-end">Current Price</th>
-                            <th class="text-end">Total Value</th>
-                            <th class="text-end">P&L ($)</th>
-                            <th class="text-end">P&L (%)</th>
+                            <th>Ação</th>
+                            <th>Nome</th>
+                            <th class="text-end">Cotas</th>
+                            <th class="text-end">Preço Atual</th>
+                            <th class="text-end">Valor Total</th>
+                            <th class="text-end">G&P ($)</th>
+                            <th class="text-end">G&P (%)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -38,11 +38,11 @@
                                 <td><strong>{{ share.symbol }}</strong></td>
                                 <td class="text-muted">{{ share.name }}</td>
                                 <td class="text-end">{{ share.shares }}</td>
-                                <td class="text-end">{{ share.price | usd }}</td>
-                                <td class="text-end"><strong>{{ share.total | usd }}</strong></td>
+                                <td class="text-end">{{ share.price | brl }}</td>
+                                <td class="text-end"><strong>{{ share.total | brl }}</strong></td>
                                 
                                 <td class="text-end {% if share.pl_value > 0 %}text-profit{% elif share.pl_value < 0 %}text-loss{% endif %}">
-                                    {{ "+" if share.pl_value > 0 else "" }}{{ share.pl_value | usd }}
+                                    {{ "+" if share.pl_value > 0 else "" }}{{ share.pl_value | brl }}
                                 </td>
                                 <td class="text-end {% if share.pl_percent > 0 %}text-profit{% elif share.pl_percent < 0 %}text-loss{% endif %}">
                                     {{ "+" if share.pl_percent > 0 else "" }}{{ "%.2f"|format(share.pl_percent) }}%
@@ -52,14 +52,20 @@
                     </tbody>
                     <tfoot style="border-top: 2px solid #444;">
                         <tr>
-                            <td colspan="4" class="text-end text-muted">CASH IN ACCOUNT</td>
-                            <td class="text-end text-primary fw-bold">{{ cash | usd }}</td>
-                            <td colspan="2"></td>
+                            <td colspan="7" class="py-3">
+                                <div class="d-flex justify-content-between align-items-center px-2">
+                                    <span class="text-muted">DINHEIRO NA CONTA</span>
+                                    <span class="text-primary fw-bold">{{ cash | brl }}</span>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td colspan="4" class="text-end text-muted"><strong>TOTAL PATRIMONY</strong></td>
-                            <td class="text-end text-success fw-bold fs-5">{{ total_cash | usd }}</td>
-                            <td colspan="2"></td>
+                            <td colspan="7" class="py-3">
+                                <div class="d-flex justify-content-between align-items-center px-2">
+                                    <span class="text-muted fw-bold">PATRIMÔNIO TOTAL</span>
+                                    <span class="text-success fw-bold fs-5">{{ total_cash | brl }}</span>
+                                </div>
+                            </td>
                         </tr>
                     </tfoot>
                 </table>

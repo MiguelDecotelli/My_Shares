@@ -1,16 +1,16 @@
 {% extends "layout.html" %}
 
-{% block title %} Buy {% endblock %}
+{% block title %} Comprar Ações {% endblock %}
 
 {% block main %}
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5 mt-4">
-        <h3 class="mb-4">Buy Shares</h3>
+        <h3 class="mb-4">Comprar Ações</h3>
         <form method="post">
             {{ form.hidden_tag() }}
             
             <div class="mb-3 text-start">
-                <label class="form-label text-muted ms-1">Symbol (e.g. AAPL, TSLA)</label>
+                <label class="form-label text-muted ms-1">Ações (e.g. PETR4, VALE3)</label>
                 <!-- AQUI ESTÁ A LÓGICA DA TRAVA -->
                 {% if request.args.get('symbol') %}
                     {{ form.symbol(class="form-control form-control-lg text-uppercase text-muted", readonly="readonly") }}
@@ -20,7 +20,7 @@
             </div>
 
             <div class="mb-4 text-start">
-                <label class="form-label text-muted ms-1">Number of Shares</label>
+                <label class="form-label text-muted ms-1">Número de Cotas</label>
                 {{ form.shares(class="form-control form-control-lg", min="1") }}
             </div>
             

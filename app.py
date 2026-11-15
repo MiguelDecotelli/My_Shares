@@ -5,12 +5,13 @@ from my_shares import app, db
 from my_shares.credit_card import check_credit_card
 from my_shares.forms import *
 from my_shares.models import User, Portfolio, Watchlist
-from my_shares.my_functions import apology, lookup, usd, get_history
+from my_shares.my_functions import apology, lookup, brl, get_history, format_datetime
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-app.jinja_env.filters["usd"] = usd
+app.jinja_env.filters["brl"] = brl
+app.jinja_env.filters["datetime"] = format_datetime
 
 
 @app.after_request
@@ -36,9 +37,9 @@ def register():
             db.session.add(user)
             db.session.commit()
         except Exception:
-            return apology('Username is already taken!')
+            return apology('Nome de usuário já está em uso!')
 
-        flash("Registered!")
+        flash("Registrado!")
         return redirect(url_for("login"))
 
     return render_template("/register.html", form=form)
@@ -55,10 +56,10 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
 
         if user is None or not user.check_password(form.password.data):
-            return apology("Invalid username or password", 403)
+            return apology("Nome de usuário ou senha inválidos", 403)
 
         login_user(user)
-        flash(f'Welcome, {user.username}!')
+        flash(f'Bem vindo, {user.username}!')
 
         return redirect(url_for("index"))
 
@@ -77,13 +78,13 @@ def change_password():
 
         # Verifica direto no usuário logado
         if not current_user.check_password(old_password):
-            return apology("Password is incorrect!", 400)
+            return apology("Senha incorreta!", 400)
         
         new_password = generate_password_hash(request.form.get("new_password"))
         current_user.password_hash = new_password
 
         db.session.commit()
-        flash("Password changed!")
+        flash("Senha alterada!")
         return redirect("/")
 
     return render_template("change_password.html", form=form)
@@ -94,7 +95,7 @@ def change_password():
 def logout():
 
     logout_user()
-    flash('See you soon!')
+    flash('Até mais!')
     return redirect(url_for('index'))
 
 @app.route("/reset_account", methods=["POST"])
@@ -106,7 +107,7 @@ def reset_account():
     current_user.cash = 10000.00
     db.session.commit()
     
-    flash("Bankruptcy declared. Account reset to US$ 10,000.00.")
+    flash("Falência declarada. Conta reiniciada para R$ 10,000.00.")
     return redirect("/")
 
 @app.route("/quote", methods=["GET", "POST"])
@@ -125,7 +126,7 @@ def quote():
         ticker = lookup(symbol)
         
         if not ticker:
-            return apology("Invalid ticker symbol", 400)
+            return apology("Símbolo de ação inválido", 400)
             
         # Busca o histórico dos últimos 30 dias
         history = get_history(symbol)
@@ -149,26 +150,26 @@ def buy():
     if form.validate_on_submit():
 
         if not request.form.get("symbol"):
-            return apology("Missing symbol", 400)
+            return apology("Faltando o símbolo da ação", 400)
 
         try:
             new_shares = int(request.form.get("shares"))
         except:
-            return apology("Must be integer", 400)
+            return apology("Precisa ser inteiro", 400)
 
         try:
             ticker = lookup(request.form.get("symbol"))
             new_stocks = ticker["price"] * float(new_shares)
         except (KeyError, TypeError, ValueError):
-            return apology("Invalid ticker symbol", 400)
+            return apology("Símbolo de ação inválido", 400)
 
         if new_shares <= 0:
-            return apology("Must be positive number", 400)
+            return apology("Precisa ser um número positivo", 400)
         else:
             user_cash = current_user.cash
 
             if new_stocks > user_cash:
-                return apology("Can't afford", 400)
+                return apology("Não pode permitir", 400)
             else:
                 current_user.cash -= new_stocks
 
@@ -182,7 +183,7 @@ def buy():
                                       )
                 db.session.add(portfolio)
                 db.session.commit()
-                flash("Bought!")
+                flash("Comprada!")
                 return redirect("/")
 
     return render_template("/buy.html", form=form)
@@ -232,7 +233,7 @@ def index():
     total_cash = cash + sum(entry["total"] for entry in portfolio)
     
     # Adiciona o dinheiro em caixa no gráfico
-    chart_labels.append("Cash")
+    chart_labels.append("Caixa")
     chart_data.append(cash)
 
     return render_template("index.html", 
@@ -253,15 +254,15 @@ def sell():
         ticker = lookup(request.form.get("symbol"))
 
         if not ticker:
-            return apology("Missing symbol", 400)
+            return apology("Faltando o símbolo da ação", 400)
 
         if ticker is None:
-            return apology("Invalid symbol", 400)
+            return apology("Símbolo da ação inválido", 400)
 
         try:
             shares_to_sell = int(request.form.get("shares"))
         except ValueError:
-            return apology("Must be integer", 400)
+            return apology("Precisa ser inteiro", 400)
 
         my_shares = (
             db.session.query(
@@ -275,12 +276,12 @@ def sell():
         all_shares = sum(int(value.shares) for value in my_shares)
 
         if not my_shares:
-            return apology("You don't have any of this shares!", 400)
+            return apology("Você não tem nenhuma dessas ações!", 400)
 
         if shares_to_sell > all_shares:
-            return apology("Not enough shares", 400)
+            return apology("Não há ações suficientes para vender", 400)
         elif shares_to_sell <= 0:
-            return apology("Must be positive number", 400)
+            return apology("Precisa ser um número positivo", 400)
 
         current_price = ticker["price"]
 
@@ -301,7 +302,7 @@ def sell():
 
         db.session.commit()
 
-        flash("Sold!")
+        flash("Vendida!")
         return redirect("/")
 
     return render_template("sell.html", form=form, portfolio=portfolio)
@@ -354,16 +355,16 @@ def add_cash():
     if form.validate_on_submit():
         user_password = current_user.password_hash
         if not check_password_hash(user_password, request.form.get("password")):
-            return apology("Password is incorrect!", 403)
+            return apology("Senha incorreta!", 403)
         else:
             card = request.form.get("add_card")
             if check_credit_card(card) == False:
-                return apology("CARD IS INVALID", 403)
+                return apology("CARTÃO INVÁLIDO", 403)
             else:
                 add_cash = int(request.form.get("add_cash"))
                 current_user.cash += add_cash
                 db.session.commit()
-                flash("Cash Added!")
+                flash("Capital adicionado!")
 
             return redirect("/")
 

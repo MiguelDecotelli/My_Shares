@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 
-{% block title %} My Watchlist {% endblock %}
+{% block title %} Lista de Favoritos {% endblock %}
 
 {% block main %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-start">My Watchlist</h2>
-    <a href="/list_of_stocks" class="btn btn-outline-primary">Add More Stocks</a>
+    <h2 class="text-start">Minha Lista de Favoritos</h2>
+    <a href="/list_of_stocks" class="btn btn-outline-primary">Adicionar Mais Ações</a>
 </div>
 
 {% if not stocks %}
@@ -20,12 +20,12 @@
                 <div class="card h-100 bg-dark border-secondary custom-card" style="margin-top: 0; padding: 1.5rem;">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <span class="badge bg-primary fs-6">{{ stock.symbol }}</span>
-                        <h4 class="text-light fw-bold mb-0">{{ stock.price | usd }}</h4>
+                        <h4 class="text-light fw-bold mb-0">{{ stock.price | brl }}</h4>
                     </div>
                     <h5 class="card-title text-muted mb-4 text-truncate" title="{{ stock.name }}">{{ stock.name }}</h5>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="/quote?symbol={{ stock.symbol }}" class="btn btn-sm btn-outline-secondary">Quote</a>
-                        <a href="/buy?symbol={{ stock.symbol }}" class="btn btn-sm btn-success">Buy</a>
+                        <a href="/quote?symbol={{ stock.symbol }}" class="btn btn-sm btn-outline-secondary">Cotar</a>
+                        <a href="/buy?symbol={{ stock.symbol }}" class="btn btn-sm btn-success">Comprar</a>
                     </div>
                 </div>
             </div>

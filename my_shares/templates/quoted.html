@@ -9,7 +9,7 @@
     <div class="col-md-8 col-lg-7">
         <div class="text-center mb-4">
             <h5 class="text-muted mb-1">{{ ticker.name }} ({{ ticker.symbol }})</h5>
-            <h1 class="display-3 text-white fw-bold mb-0">{{ ticker.price | usd }}</h1>
+            <h1 class="display-3 text-white fw-bold mb-0">{{ ticker.price | brl }}</h1>
         </div>
         
         {% if history %}
@@ -19,8 +19,8 @@
         {% endif %}
 
         <div class="d-flex justify-content-center gap-3">
-            <a href="/quote" class="btn btn-outline-secondary px-4">Quote Another</a>
-            <a href="/buy?symbol={{ ticker.symbol }}" class="btn btn-primary px-4">Go to Buy</a>
+            <a href="/quote" class="btn btn-outline-secondary px-4">Cotar</a>
+            <a href="/buy?symbol={{ ticker.symbol }}" class="btn btn-primary px-4">Seguir para compra</a>
         </div>
     </div>
 </div>

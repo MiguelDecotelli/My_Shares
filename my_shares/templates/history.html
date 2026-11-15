@@ -1,41 +1,44 @@
 {% extends "layout.html" %}
 
 {% block title %}
-History
+Histórico
 {% endblock %}
 
 {% block main %}
-<h1>History</h1>
+<h1>Histórico</h1>
 {% if transactions %}
-<div class="container tables">
-    <table class="table table-hover table-borderless align-middle text-start">
-    <thead>
-        <tr>
-            <th>Symbol</th>
-            <th class="text-end">Shares</th>
-            <th class="text-end">Price</th>
-            <th class="text-center">Type</th>
-            <th class="text-end">Transacted</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in transactions %}
+<div class="table-responsive">
+    <table class="table table-hover table-borderless align-middle mt-3">
+        <thead>
             <tr>
-                <td><strong>{{ row.symbol }}</strong></td>
-                <td class="text-end">{{ row.shares }}</td>
-                <td class="text-end">{{ row.price | usd }}</td>
-                <td class="text-center">
-                    {% if row.transaction_type == 'Buy' %}
-                        <span class="badge bg-success bg-opacity-25 text-success px-3">Buy</span>
-                    {% else %}
-                        <span class="badge bg-danger bg-opacity-25 text-danger px-3">Sell</span>
-                    {% endif %}
-                </td>
-                <td class="text-end text-muted">{{ row.transaction_time }}</td>
+                <th>Ação</th>
+                <th class="text-middle">Cotas</th>
+                <th class="text-middle">Preço</th>
+                <th class="text-middle">Operação</th>
+                <th class="text-end">Data da Transação</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for row in transactions %}
+                <tr>
+                    <td><strong>{{ row.symbol }}</strong></td>
+                    <td class="text-middle">{{ row.shares }}</td>
+                    <td class="text-middle">{{ row.price | brl }}</td>
+                    
+                    <td class="text-middle">
+                        {% if row.transaction_type == 'Buy' %}
+                            <span class="badge bg-success bg-opacity-25 text-success py-2" style="min-width: 80px;">Compra</span>
+                        {% else %}
+                            <span class="badge bg-danger bg-opacity-25 text-danger py-2" style="min-width: 80px;">Venda</span>
+                        {% endif %}
+                    </td>
+                    
+                    <!-- Fatiamento [0:19] remove os microsegundos, mantendo apenas YYYY-MM-DD HH:MM:SS -->
+                    <td class="text-end text-muted">{{ row.transaction_time | datetime }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% else %}
 <div>

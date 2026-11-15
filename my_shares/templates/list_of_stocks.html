@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 
-{% block title %} Search Stocks {% endblock %}
+{% block title %} Pesquisar Ações {% endblock %}
 
 {% block main %}
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-7 mt-4 mb-5">
-        <h3 class="mb-4">Live Search</h3>
+        <h3 class="mb-4">Consulta ao Vivo</h3>
         <div class="input-group input-group-lg">
             <span class="input-group-text bg-dark border-secondary text-muted" id="search-icon">🔍</span>
-            <input type="text" id="liveSearchInput" class="form-control bg-dark text-light border-secondary" placeholder="Start typing a symbol or name (e.g., TSLA, Apple)..." autofocus>
+            <input type="text" id="liveSearchInput" class="form-control bg-dark text-light border-secondary" placeholder="Comece a digitar um símbolo ou nome (ex., PETR4, VALE3)..." autofocus>
         </div>
     </div>
 </div>
@@ -18,11 +18,11 @@
         <thead>
             <tr>
                 <th style="width: 5%"></th>
-                <th>Symbol</th>
-                <th>Company Name</th>
-                <th>Industry</th>
-                <th class="text-end">Market Cap</th>
-                <th class="text-end">Action</th>
+                <th>Ação</th>
+                <th>Nome da Empresa</th>
+                <th>Indústria</th>
+                <th class="text-end">Capitalização de Mercado</th>
+                <th class="text-end">Ação</th>
             </tr>
         </thead>
         <tbody id="resultsBody">
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function() {
                                 <td class="text-muted">${stock.industry}</td>
                                 <td class="text-end text-light">${stock.market_cap}</td>
                                 <td class="text-end">
-                                    <a href="/quote?symbol=${stock.symbol}" class="btn btn-sm btn-outline-secondary">Quote</a>
+                                    <a href="/quote?symbol=${stock.symbol}" class="btn btn-sm btn-outline-secondary">Cotar</a>
                                 </td>
                             </tr>
                         `;

@@ -1,17 +1,17 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Quote
+    Cotar Ações
 {% endblock %}
 
 {% block main %}
 <div class="row justify-content-center">
     <div class="col-md-6 col-lg-5 mt-4">
-        <h3 class="mb-4">Quote a Stock</h3>
+        <h3 class="mb-4">Cotar uma Ação</h3>
         <form method="post">
             {{ form.hidden_tag() }}
             <div class="mb-3 text-start">
-                <label class="form-label text-muted ms-1">Symbol (e.g. AAPL, TSLA)</label>
+                <label class="form-label text-muted ms-1">Ação (e.g. VALE3, PETR4)</label>
                 {% if request.args.get('symbol') %}
                     {{ form.symbol(class="form-control form-control-lg text-uppercase text-muted", readonly="readonly") }}
                 {% else %}
